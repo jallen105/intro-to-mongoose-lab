@@ -30,6 +30,8 @@ const runQueries = async () => {
         await createCustomer()
     } else if (action == 2) {
         await viewAllCustomers()
+    } else if (action == 3) {
+        await updateCustomer()
     }
 }
 
@@ -43,15 +45,45 @@ const createCustomer = async () => {
     }
 
     const customer = await Customer.create(customerData)
-    console.log('New customer:', customer)
-    runQueries()
+    console.log(`New customer - id: ${customer._id} -- Name: ${customer.name}, Age: ${customer.age}`)
+
+    await runQueries()
 }
 
 const viewAllCustomers = async () => {
     const customers = await Customer.find({})
-    console.log('All customers:', customers)
+    customers.forEach((customer) => {
+        console.log(`id: ${customer._id} -- Name: ${customer.name}, Age: ${customer.age}`)
+    })
 
-    runQueries()
+    await runQueries()
+}
+
+const updateCustomer = async () => {
+
+    const customers = await Customer.find({})
+    console.log('Below is a list of customers:\n')
+
+    customers.forEach((customer) => {
+        console.log(`id: ${customer._id} -- Name: ${customer.name}, Age: ${customer.age}`)
+    })
+
+    const id = prompt('Copy and paste the id of the customer you would like to update here:')
+
+    const newName = prompt('What is the customers new name?')
+
+    const newAge = prompt('What is the customers new age?')
+
+    await Customer.findByIdAndUpdate(
+        id,
+        { 
+            name: newName,
+            age: newAge
+        },
+        { new: true }
+    )
+
+    await runQueries()
 }
 
 connect()
