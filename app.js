@@ -9,7 +9,8 @@ const connect = async () => {
 
     await crmPrompt()
 
-    await mongoose.disconnect()
+    console.log('exiting...')
+    mongoose.connection.close()
 
     process.exit()
 }
@@ -33,8 +34,7 @@ const crmPrompt = async () => {
     } else if (action == 4) {
         await deleteCustomer()
     } else if (action == 5) {
-        console.log('exiting...')
-        mongoose.connection.close()
+        return
     }
 }
 
