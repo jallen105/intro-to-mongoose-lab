@@ -6,17 +6,15 @@ const Customer = require('./models/customer.js')
 
 const connect = async () => {
     await mongoose.connect(process.env.MONGODB_URI)
-    console.log('Connected to MongoDB')
 
-    await runQueries()
+    await crmPrompt()
 
     await mongoose.disconnect()
-    console.log('Disconnected from MongoDB')
 
     process.exit()
 }
 
-const runQueries = async () => {
+const crmPrompt = async () => {
     console.log('Welcome to the CRM \n')
     console.log('What would you like to do?\n')
     console.log('1. Create a customer')
@@ -32,6 +30,11 @@ const runQueries = async () => {
         await viewAllCustomers()
     } else if (action == 3) {
         await updateCustomer()
+    } else if (action == 4) {
+        await deleteCustomer()
+    } else if (action == 5) {
+        console.log('exiting...')
+        mongoose.connection.close()
     }
 }
 
@@ -47,7 +50,7 @@ const createCustomer = async () => {
     const customer = await Customer.create(customerData)
     console.log(`New customer - id: ${customer._id} -- Name: ${customer.name}, Age: ${customer.age}`)
 
-    await runQueries()
+    await crmPrompt()
 }
 
 const viewAllCustomers = async () => {
@@ -56,7 +59,7 @@ const viewAllCustomers = async () => {
         console.log(`id: ${customer._id} -- Name: ${customer.name}, Age: ${customer.age}`)
     })
 
-    await runQueries()
+    await crmPrompt()
 }
 
 const updateCustomer = async () => {
@@ -83,7 +86,23 @@ const updateCustomer = async () => {
         { new: true }
     )
 
-    await runQueries()
+    await crmPrompt()
+}
+
+const deleteCustomer = async () => {
+
+    const customers = await Customer.find({})
+    console.log('Below is a list of customers:\n')
+
+    customers.forEach((customer) => {
+        console.log(`id: ${customer._id} -- Name: ${customer.name}, Age: ${customer.age}`)
+    })
+
+    const id = prompt('Copy and paste the id of the customer you would like to delete here:')
+
+    await Customer.findByIdAndDelete(id)
+
+    await crmPrompt()
 }
 
 connect()
